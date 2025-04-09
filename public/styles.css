@@ -1,0 +1,11 @@
+.toolbar {
+  @apply bg-gray-800 text-white flex items-center p-4;
+}
+
+.toolbar-icon {
+  @apply w-6 h-6 mr-4;
+}
+
+.toolbar-menu-item {
+  @apply btn btn-sm btn-gray-800 hover:bg-gray-900;
+}
