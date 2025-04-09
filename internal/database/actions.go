@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"ikoyhn/podcast-sponsorblock/internal/common"
 	"ikoyhn/podcast-sponsorblock/internal/models"
 	"os"
 	"time"
@@ -36,72 +35,6 @@ func DeletePodcastCronJob() {
 		os.Remove("/config/audio/" + history.YoutubeVideoId + ".m4a")
 		db.Delete(&history)
 		log.Info("[DB] Deleted old episode playback history... " + history.YoutubeVideoId)
-	}
-}
-
-func TrackEpisodeFiles() {
-	log.Info("[DB] Tracking existing episode files...")
-	audioDir := "/config/audio"
-	if _, err := os.Stat(audioDir); os.IsNotExist(err) {
-		os.MkdirAll(audioDir, 0755)
-	}
-	if _, err := os.Stat("/config"); os.IsNotExist(err) {
-		os.MkdirAll("/config", 0755)
-	}
-	files, err := os.ReadDir("/config/audio/")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dbFiles := make([]string, 0)
-	db.Model(&models.EpisodePlaybackHistory{}).Pluck("YoutubeVideoId", &dbFiles)
-
-	missingFiles := make([]string, 0)
-	nonExistentDbFiles := make([]string, 0)
-	for _, file := range files {
-		filename := file.Name()
-		if !common.IsValidFilename(filename) {
-			continue
-		}
-		found := false
-		for _, dbFile := range dbFiles {
-			if dbFile == filename[:len(filename)-4] {
-				found = true
-				break
-			}
-		}
-		if !found {
-			missingFiles = append(missingFiles, filename)
-		}
-	}
-
-	for _, dbFile := range dbFiles {
-		found := false
-		for _, file := range files {
-			if dbFile == file.Name()[:len(file.Name())-4] {
-				found = true
-				break
-			}
-		}
-		if !found {
-			nonExistentDbFiles = append(nonExistentDbFiles, dbFile)
-		}
-	}
-
-	for _, filename := range missingFiles {
-		id := filename[:len(filename)-4]
-		if !common.IsValidID(id) {
-			continue
-		}
-		db.Create(&models.EpisodePlaybackHistory{YoutubeVideoId: id, LastAccessDate: time.Now().Unix(), TotalTimeSkipped: 0})
-	}
-
-	for _, dbFile := range nonExistentDbFiles {
-		if !common.IsValidID(dbFile) {
-			continue
-		}
-		db.Where("youtube_video_id = ?", dbFile).Delete(&models.EpisodePlaybackHistory{})
-		log.Info("[DB] Deleted non-existent episode playback history... " + dbFile)
 	}
 }
 
@@ -166,4 +99,10 @@ func GetPodcast(id string) *models.Podcast {
 
 func SavePodcast(podcast *models.Podcast) {
 	db.Create(&podcast)
+}
+
+func GetAllPodcasts() []models.Podcast {
+	var podcasts []models.Podcast
+	db.Find(&podcasts)
+	return podcasts
 }

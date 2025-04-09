@@ -1,0 +1,32 @@
+<table class="table-auto w-full">
+	<thead class="bg-gray-100">
+		<tr>
+			<th class="px-4 py-2 text-left">ID</th>
+			<th class="px-4 py-2 text-left">Apple ID</th>
+			<th class="px-4 py-2 text-left">Podcast Name</th>
+			<th class="px-4 py-2 text-left">Description</th>
+			<th class="px-4 py-2 text-left">Category</th>
+			<th class="px-4 py-2 text-left">Posted Date</th>
+			<th class="px-4 py-2 text-left">Image URL</th>
+			<th class="px-4 py-2 text-left">Last Build Date</th>
+			<th class="px-4 py-2 text-left">Artist Name</th>
+			<th class="px-4 py-2 text-left">Explicit</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{ range .Podcasts }}
+		<tr>
+			<td class="border px-4 py-2">{{ .Id }}</td>
+			<td class="border px-4 py-2">{{ .AppleId }}</td>
+			<td class="border px-4 py-2">{{ .PodcastName }}</td>
+			<td class="border px-4 py-2">{{ .Description }}</td>
+			<td class="border px-4 py-2">{{ .Category }}</td>
+			<td class="border px-4 py-2">{{ .PostedDate }}</td>
+            <td class="border px-4 py-2"><a href="{{ .ImageUrl }}" target="_blank">{{ .ImageUrl }}</a></td>
+			<td class="border px-4 py-2">{{ .LastBuildDate }}</td>
+			<td class="border px-4 py-2">{{ .ArtistName }}</td>
+			<td class="border px-4 py-2">{{ .Explicit }}</td>
+		</tr>
+		{{ end }}
+	</tbody>
+</table>

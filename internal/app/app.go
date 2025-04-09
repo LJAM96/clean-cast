@@ -27,6 +27,7 @@ func Start() {
 	setupCron()
 	setupLogging(e)
 	setupHandlers(e)
+	registerHtmxRoutes(e)
 	registerRoutes(e)
 }
 
