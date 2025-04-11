@@ -22,7 +22,7 @@ func registerHtmxRoutes(e *echo.Echo) {
 	e.GET("/podcasts", func(c echo.Context) error {
 		podcasts, err := services.GetAllPodcasts()
 		if err != nil {
-			return c.HTML(http.StatusNotFound, "<h1>No podcasts found</h1>")
+			return c.HTML(http.StatusOK, "<h1>No podcasts found</h1>")
 		}
 
 		tmpl, err := template.ParseFiles("../../public/pages/podcasts/podcasts.html")
@@ -34,6 +34,33 @@ func registerHtmxRoutes(e *echo.Echo) {
 			Podcasts []models.Podcast
 		}{
 			Podcasts: podcasts,
+		}
+
+		buf := new(bytes.Buffer)
+		err = tmpl.Execute(buf, data)
+		if err != nil {
+			return err
+		}
+
+		return c.HTML(http.StatusOK, buf.String())
+	})
+
+	e.GET("/popup/:id", func(c echo.Context) error {
+		id := c.Param("id")
+		episodes, err := services.GetPodcastEpisodesByPodcastId(id)
+		if err != nil {
+			return c.HTML(http.StatusOK, "<h1>No episodes found</h1>")
+		}
+
+		tmpl, err := template.ParseFiles("../../public/pages/podcasts/popup.html")
+		if err != nil {
+			return err
+		}
+
+		data := struct {
+			Episodes []models.PodcastEpisode
+		}{
+			Episodes: episodes,
 		}
 
 		buf := new(bytes.Buffer)

@@ -17,19 +17,19 @@ var db *gorm.DB
 func SetupDatabase() {
 	var err error
 	// Create the database file if it doesn't exist
-	if _, err := os.Stat("/config/sqlite.db"); os.IsNotExist(err) {
+	if _, err := os.Stat("C:/Users/jared/Documents/code/config/sqlite.db"); os.IsNotExist(err) {
 		err := os.MkdirAll("/config", os.ModePerm)
 		if err != nil {
 			panic(err)
 		}
-		f, err := os.Create("/config/sqlite.db")
+		f, err := os.Create("C:/Users/jared/Documents/code/config/sqlite.db")
 		if err != nil {
 			panic(err)
 		}
 		f.Close()
 	}
 
-	db, err = gorm.Open(sqlite.Open("/config/sqlite.db"), &gorm.Config{
+	db, err = gorm.Open(sqlite.Open("C:/Users/jared/Documents/code/config/sqlite.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
@@ -52,14 +52,14 @@ func SetupDatabase() {
 
 func TrackEpisodeFiles() {
 	log.Info("[DB] Tracking existing episode files...")
-	audioDir := "/config/audio"
+	audioDir := "C:/Users/jared/Documents/code/config/audio"
 	if _, err := os.Stat(audioDir); os.IsNotExist(err) {
 		os.MkdirAll(audioDir, 0755)
 	}
-	if _, err := os.Stat("/config"); os.IsNotExist(err) {
-		os.MkdirAll("/config", 0755)
+	if _, err := os.Stat("C:/Users/jared/Documents/code/config"); os.IsNotExist(err) {
+		os.MkdirAll("C:/Users/jared/Documents/code/config", 0755)
 	}
-	files, err := os.ReadDir("/config/audio/")
+	files, err := os.ReadDir("C:/Users/jared/Documents/code/config/audio/")
 	if err != nil {
 		log.Fatal(err)
 	}

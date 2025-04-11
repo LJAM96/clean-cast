@@ -27,6 +27,16 @@
         </div>
       </div>
     </nav>
-    <div id="content" class="p-4"></div>
+    <div id="content" class="p-4 overflow-x-auto"></div>
+
+    <script>
+      function openPopup(id) {
+        fetch('/popup/' + id)
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('popup-' + id).innerHTML = html;
+          });
+      }
+      </script>
   </body>
 </html>

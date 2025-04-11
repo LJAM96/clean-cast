@@ -13,3 +13,11 @@ func GetAllPodcasts() ([]models.Podcast, error) {
 	}
 	return podcasts, nil
 }
+
+func GetPodcastEpisodesByPodcastId(podcastId string) ([]models.PodcastEpisode, error) {
+	episodes, err := database.GetPodcastEpisodesByPodcastId(podcastId)
+	if err != nil {
+		return nil, err
+	}
+	return episodes, nil
+}
