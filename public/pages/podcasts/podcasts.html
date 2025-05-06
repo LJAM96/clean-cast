@@ -11,10 +11,11 @@
 			<th class="px-4 py-2 text-left">Last Build Date</th>
 			<th class="px-4 py-2 text-left">Artist Name</th>
 			<th class="px-4 py-2 text-left">Explicit</th>
-			<th class="px-4 py-2 text-left">Actions</th>
+			<th class="px-4 py-2 text-left">Episodes</th>
+			<th class="px-4 py-2 text-left">Delete</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody class="overflow-x-auto h-96">
 		{{ range .Podcasts }}
 		<tr>
 			<td class="border px-4 py-2">{{ .Id }}</td>
@@ -28,8 +29,13 @@
 			<td class="border px-4 py-2">{{ .ArtistName }}</td>
 			<td class="border px-4 py-2">{{ .Explicit }}</td>
 			<td class="border px-4 py-2">
-				<div hx-get="/popup/{{ .Id }}" hx-target="#popup-{{ .Id }}" hx-swap="innerHTML">
-					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openPopup('{{ .Id }}')">Open Popup</button>
+				<div hx-get="/episodes/{{ .Id }}" hx-target="#content" hx-swap="innerHTML">
+					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" >View Episodes</button>
+				</div>
+			</td>
+			<td class="border px-4 py-2">
+				<div hx-get="/episodes/{{ .Id }}" hx-target="#content" hx-swap="innerHTML">
+					<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" >Delete</button>
 				</div>
 			</td>
 		</tr>

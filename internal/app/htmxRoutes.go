@@ -15,8 +15,57 @@ func registerHtmxRoutes(e *echo.Echo) {
 	e.GET("/", func(c echo.Context) error {
 		return c.File("../../public/index.html")
 	})
+
 	e.GET("/dashboard", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, "<h1>Dashboard</h1>")
+		appleResponse, err := services.GetTopPodcasts(10)
+		if err != nil {
+			return c.HTML(http.StatusOK, "<h1>No podcasts found</h1>")
+		}
+
+		tmpl, err := template.ParseFiles("../../public/pages/dashboard/dashboard.html")
+		if err != nil {
+			return err
+		}
+
+		data := struct {
+			AppleResponse []models.TopPodcast
+		}{
+			AppleResponse: appleResponse,
+		}
+
+		buf := new(bytes.Buffer)
+		err = tmpl.Execute(buf, data)
+		if err != nil {
+			return err
+		}
+
+		return c.HTML(http.StatusOK, buf.String())
+	})
+
+	e.GET("/modal", func(c echo.Context) error {
+		appleResponse, err := services.GetTopPodcasts(10)
+		if err != nil {
+			return c.HTML(http.StatusOK, "<h1>No podcasts found</h1>")
+		}
+
+		tmpl, err := template.ParseFiles("../../public/pages/dashboard/modal.html")
+		if err != nil {
+			return err
+		}
+
+		data := struct {
+			AppleResponse []models.TopPodcast
+		}{
+			AppleResponse: appleResponse,
+		}
+
+		buf := new(bytes.Buffer)
+		err = tmpl.Execute(buf, data)
+		if err != nil {
+			return err
+		}
+
+		return c.HTML(http.StatusOK, buf.String())
 	})
 
 	e.GET("/podcasts", func(c echo.Context) error {
@@ -45,14 +94,14 @@ func registerHtmxRoutes(e *echo.Echo) {
 		return c.HTML(http.StatusOK, buf.String())
 	})
 
-	e.GET("/popup/:id", func(c echo.Context) error {
+	e.GET("/episodes/:id", func(c echo.Context) error {
 		id := c.Param("id")
 		episodes, err := services.GetPodcastEpisodesByPodcastId(id)
 		if err != nil {
 			return c.HTML(http.StatusOK, "<h1>No episodes found</h1>")
 		}
 
-		tmpl, err := template.ParseFiles("../../public/pages/podcasts/popup.html")
+		tmpl, err := template.ParseFiles("../../public/pages/podcasts/episodes.html")
 		if err != nil {
 			return err
 		}

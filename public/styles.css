@@ -1,0 +1,11 @@
+.custom-height {
+  height: calc(100vh - 64px);
+}
+
+.container {
+  width: 220px !important;
+}
+
+.text-sm {
+  word-wrap: break-word;
+}

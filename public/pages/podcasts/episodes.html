@@ -1,0 +1,27 @@
+<button hx-get="/podcasts" hx-target="#content" hx-swap="innerHTML" hx-trigger="click"
+    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Back</button>
+<div class="episodes-content">
+    <h1 class="text-2xl font-bold mb-4">Podcast Episodes</h1>
+    <table class="w-full table-auto">
+        <thead>
+            <tr>
+                <th class="px-4 py-2 text-left border-b border-gray-200">Youtube Video Id</th>
+                <th class="px-4 py-2 text-left border-b border-gray-200">Episode Name</th>
+                <th class="px-4 py-2 text-left border-b border-gray-200">Episode Description</th>
+                <th class="px-4 py-2 text-left border-b border-gray-200">Published Date</th>
+                <th class="px-4 py-2 text-left border-b border-gray-200">Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Episodes }}
+            <tr>
+                <td class="max-w-md whitespace-nowrap border-b border-gray-200 px-4 py-2">{{ .YoutubeVideoId }}</td>
+                <td class="border-b border-gray-200 px-4 py-2">{{ .EpisodeName }}</td>
+                <td class="truncate max-w-lg border-b border-gray-200 px-4 py-2">{{ .EpisodeDescription }}</td>
+                <td class="border-b border-gray-200 px-4 py-2">{{ .PublishedDate }}</td>
+                <td class="border-b border-gray-200 px-4 py-2">{{ .Type }}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
