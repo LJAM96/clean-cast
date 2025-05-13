@@ -4,32 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"ikoyhn/podcast-sponsorblock/internal/models"
+	"ikoyhn/podcast-sponsorblock/internal/store"
 	"io"
 	"net/http"
+	"strings"
 
 	log "github.com/labstack/gommon/log"
 )
 
 const ITUNES_TOP_PODCASTS_URL = "https://itunes.apple.com/gb/rss/toppodcasts/limit=%d/json"
 const ITUNES_SEARCH_URL = "https://itunes.apple.com/search?term=%s&limit=1&media=podcast&callback="
-
-// // Apple API lookup for podcast metadata
-// func SearchForPodcast(podcastName string) LookupResponse {
-// 	log.Debug("[RSS FEED] Looking up podcast in Apple Search API...")
-// 	resp, err := http.Get(fmt.Sprintf(ITUNES_SEARCH_URL, strings.ReplaceAll(podcastName, " ", "")))
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	body, bodyErr := io.ReadAll(resp.Body)
-// 	if bodyErr != nil {
-// 		log.Fatal(bodyErr)
-// 	}
-// 	lookupResponse, marshErr := unmarshalAppleLookupResponse(body)
-// 	if marshErr != nil {
-// 		log.Fatal(marshErr)
-// 	}
-// 	return lookupResponse
-// }
 
 type TopPodcastResponse struct {
 	Feed struct {
@@ -57,6 +41,11 @@ type TopPodcastResponse struct {
 
 func GetTopPodcasts(limit int) ([]models.TopPodcast, error) {
 	log.Debug("[DASHBOARD] Getting Top Podcasts...")
+	val, ok := store.GetValue(fmt.Sprintf(ITUNES_TOP_PODCASTS_URL, limit))
+	if ok {
+		return val.([]models.TopPodcast), nil
+	}
+
 	resp, err := http.Get(fmt.Sprintf(ITUNES_TOP_PODCASTS_URL, limit))
 	if err != nil {
 		return []models.TopPodcast{}, err
@@ -83,11 +72,12 @@ func GetTopPodcasts(limit int) ([]models.TopPodcast, error) {
 		topPodcasts[i] = models.TopPodcast{
 			Id:          result.ID.Label,
 			Image:       result.Images[len(result.Images)-1].Label,
-			Title:       result.Name.Label,
+			Title:       strings.ReplaceAll(result.Name.Label, "'", ""),
 			Category:    result.Category.Attributes.Label,
 			Description: result.Summary.Label,
 		}
 	}
 
+	store.StoreValue(fmt.Sprintf(ITUNES_TOP_PODCASTS_URL, limit), topPodcasts)
 	return topPodcasts, nil
 }
