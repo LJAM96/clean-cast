@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"ikoyhn/podcast-sponsorblock/internal/config"
+	"ikoyhn/podcast-sponsorblock/internal/services/ntfy"
 	"os"
 	"path"
 	"strings"
@@ -44,6 +45,7 @@ func GetYoutubeVideo(youtubeVideoId string) (string, <-chan struct{}) {
 	}
 	categories = strings.TrimSpace(categories)
 
+	ntfy.SendNotification("Starting download for YouTube video", "Clean Cast")
 	dl := ytdlp.New().
 		NoProgress().
 		FormatSort("ext::m4a[format_note*=original]").
@@ -53,7 +55,7 @@ func GetYoutubeVideo(youtubeVideoId string) (string, <-chan struct{}) {
 		FFmpegLocation("/usr/bin/ffmpeg").
 		Continue().
 		Paths(config.Config.AudioDir).
-		ProgressFunc(500*time.Millisecond, func(prog ytdlp.ProgressUpdate) {
+		ProgressFunc(2000*time.Millisecond, func(prog ytdlp.ProgressUpdate) {
 			fmt.Printf(
 				"%s @ %s [eta: %s] :: %s\n",
 				prog.Status,
@@ -75,14 +77,18 @@ func GetYoutubeVideo(youtubeVideoId string) (string, <-chan struct{}) {
 		if r.ExitCode != 0 {
 			file, err := os.Open(path.Join(config.Config.AudioDir, youtubeVideoId+".m4a"))
 			if file != nil || err == nil {
+				ntfy.SendNotification("Download completed!", "Clean Cast - Success")
 				log.Warn("Download exited with non-zero code, but file exists: ", filePath)
 			} else {
 				if dlErr != nil {
+					ntfy.SendNotification("Download failed!", "Clean Cast - Error")
 					log.Errorf("Error downloading YouTube video: %v", dlErr)
 				}
 			}
 		} else {
-			log.Infof(" %w Download completed successfully.", youtubeVideoId)
+			log.Infof("%s Download completed successfully.", youtubeVideoId)
+			ntfy.SendNotification("Download completed!", "Clean Cast - Success")
+
 		}
 		mutex.(*sync.Mutex).Unlock()
 

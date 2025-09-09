@@ -7,6 +7,7 @@ import (
 	"ikoyhn/podcast-sponsorblock/internal/models"
 	"ikoyhn/podcast-sponsorblock/internal/services/common"
 	"ikoyhn/podcast-sponsorblock/internal/services/downloader"
+	"ikoyhn/podcast-sponsorblock/internal/services/ntfy"
 	"ikoyhn/podcast-sponsorblock/internal/services/playlist"
 	"ikoyhn/podcast-sponsorblock/internal/services/rss"
 	"ikoyhn/podcast-sponsorblock/internal/services/sponsorblock"
@@ -87,6 +88,8 @@ func registerRoutes(e *echo.Echo) {
 				return nil
 			}
 			return c.Stream(http.StatusOK, "audio/mp4", file)
+		} else {
+			ntfy.SendNotification("Episode already downloaded!", "Clean Cast")
 		}
 
 		database.UpdateEpisodePlaybackHistory(fileName[:len(fileName)-4], totalTimeSkipped)
