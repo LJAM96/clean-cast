@@ -45,7 +45,7 @@ func GetYoutubeVideo(youtubeVideoId string) (string, <-chan struct{}) {
 	}
 	categories = strings.TrimSpace(categories)
 
-	ntfy.SendNotification("Starting download for YouTube video", "Clean Cast")
+	etaNotified := false
 	dl := ytdlp.New().
 		NoProgress().
 		FormatSort("ext::m4a[format_note*=original]").
@@ -55,19 +55,16 @@ func GetYoutubeVideo(youtubeVideoId string) (string, <-chan struct{}) {
 		FFmpegLocation("/usr/bin/ffmpeg").
 		Continue().
 		Paths(config.Config.AudioDir).
-		ProgressFunc(2000*time.Millisecond, func(prog ytdlp.ProgressUpdate) {
-			fmt.Printf(
-				"%s @ %s [eta: %s] :: %s\n",
-				prog.Status,
-				prog.PercentString(),
-				prog.ETA(),
-				prog.Filename,
-			)
+		ProgressFunc(4000*time.Millisecond, func(prog ytdlp.ProgressUpdate) {
+			ytdlpProgress(prog, etaNotified, youtubeVideoId)
 		}).
 		Output(youtubeVideoId + ".%(ext)s")
 
 	if config.Config.CookiesFile != "" {
 		dl.Cookies(config.Config.CookiesFile)
+	}
+	if config.Config.YtdlpExtractorArgs != "" {
+		dl.ExtractorArgs(config.Config.YtdlpExtractorArgs)
 	}
 
 	done := make(chan struct{})
@@ -96,4 +93,23 @@ func GetYoutubeVideo(youtubeVideoId string) (string, <-chan struct{}) {
 	}()
 
 	return youtubeVideoId, done
+}
+
+func ytdlpProgress(prog ytdlp.ProgressUpdate, etaNotified bool, youtubeVideoId string) {
+	fmt.Printf(
+		"%s @ %s [eta: %s] :: %s\n",
+		prog.Status,
+		prog.PercentString(),
+		prog.ETA(),
+		prog.Filename,
+	)
+
+	if !etaNotified {
+		eta := prog.ETA()
+		if eta > time.Duration(0) {
+			msg := fmt.Sprintf("Downloading %s — %s @ %s (eta: %s)", youtubeVideoId, prog.Status, prog.PercentString(), eta)
+			ntfy.SendNotification(msg, "Clean Cast")
+			etaNotified = true
+		}
+	}
 }
