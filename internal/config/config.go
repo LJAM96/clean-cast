@@ -55,7 +55,7 @@ func init() {
 
 	Config.ConfigDir = os.Getenv("CONFIG_DIR")
 	if Config.ConfigDir == "" {
-		log.Fatal("CONFIG | CONFIG_DIR is not set! Please set using Docker variable.")
+		Config.ConfigDir = "/config"
 	}
 
 	Config.DbFile = path.Join(Config.ConfigDir, "sqlite.db")
