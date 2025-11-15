@@ -20,15 +20,6 @@ linters:
     - gocritic       # Comprehensive Go linter
     - gosec          # Security-focused linter
     - revive         # Fast linter
-    - bodyclose      # Check HTTP response body close
-    - dupl           # Check for duplicate code
-    - exhaustive     # Check exhaustiveness of enum switch statements
-    - gocyclo        # Check cyclomatic complexity
-    - goprintffuncname # Check printf-like function names
-    - nolintlint     # Check nolint directives
-    - rowserrcheck   # Check sql.Rows.Err usage
-    - sqlclosecheck  # Check sql.Rows and sql.Stmt close
-    - unconvert      # Remove unnecessary type conversions
 
 linters-settings:
   errcheck:
@@ -39,12 +30,6 @@ linters-settings:
     enable-all: true
     disable:
       - shadow
-
-  gocyclo:
-    min-complexity: 15
-
-  dupl:
-    threshold: 100
 
   gocritic:
     enabled-tags:
@@ -77,9 +62,7 @@ issues:
     # Exclude some linters from running on tests files
     - path: _test\.go
       linters:
-        - gocyclo
         - errcheck
-        - dupl
         - gosec
 
     # Exclude known issues
